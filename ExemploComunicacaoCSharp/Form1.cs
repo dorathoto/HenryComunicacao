@@ -52,8 +52,7 @@ namespace ExemploComunicacaoCSharp
 
                 if (client == null)
                 {
-                    client = new Socket(AddressFamily.InterNetwork,
-                    SocketType.Stream, ProtocolType.Tcp);
+                    client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 }
                 // Create a TCP/IP socket.
                 bool conectado = client.Connected;
@@ -61,8 +60,7 @@ namespace ExemploComunicacaoCSharp
                 if (conectado == false)
                 {
                     // Connect to the remote endpoint.
-                    client.BeginConnect(remoteEP,
-                        new AsyncCallback(ConnectCallback), client);
+                    client.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), client);
                     connectDone.WaitOne();
                 }
 
@@ -114,7 +112,6 @@ namespace ExemploComunicacaoCSharp
                 while (i < quantBytesRec)
                 {
                     response += (char)bufferBytes[i];
-
                     i++;
                 }
 
@@ -234,13 +231,12 @@ namespace ExemploComunicacaoCSharp
         public byte calcCheckSumString(string data)
         {
             String strBuf = "";
-            String strAux = "";
             byte cks = 0;
             int i = 0;
 
             while (i < data.Length)
             {
-                strAux = ((byte)(data.ElementAt(i))).ToString("X2");
+                string strAux = ((byte)(data.ElementAt(i))).ToString("X2");
                 strBuf += strAux;
                 cks = (byte)(cks ^ (byte)(data.ElementAt(i)));
                 i++;
@@ -266,7 +262,7 @@ namespace ExemploComunicacaoCSharp
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine(e.Message.ToString());
             }
         }
 
@@ -306,7 +302,7 @@ namespace ExemploComunicacaoCSharp
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine(e.Message.ToString());
             }
         }
 
@@ -316,16 +312,14 @@ namespace ExemploComunicacaoCSharp
             byte[] byteData = Encoding.Default.GetBytes(data);
 
             // Begin sending the data to the remote device.
-            client.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), client);
+            client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
         }
 
         private static void Send2(Socket client, byte[] byteData)
         {
 
             // Begin sending the data to the remote device.
-            client.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), client);
+            client.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), client);
         }
 
         private static void SendCallback(IAsyncResult ar)
@@ -739,7 +733,6 @@ namespace ExemploComunicacaoCSharp
             strRec = DecryptStringFromBytes_Aes(byteData2, chaveAes, IV);
             strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
             strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
-
             strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
 
             txtDataHora.Text = strRec;
