@@ -14,13 +14,9 @@ namespace ExemploComunicacaoCSharp
     {
         private static String response = String.Empty;
         private const int port = 3000;
-        // ManualResetEvent instances signal completion.
-        private static ManualResetEvent connectDone =
-            new ManualResetEvent(false);
-        private static ManualResetEvent sendDone =
-            new ManualResetEvent(false);
-        private static ManualResetEvent receiveDone =
-            new ManualResetEvent(false);
+        private static readonly ManualResetEvent connectDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent sendDone = new ManualResetEvent(false);
+        private static readonly ManualResetEvent receiveDone = new ManualResetEvent(false);
         private Socket client;
 
         private byte[] chaveAes = new byte[16];
@@ -39,9 +35,6 @@ namespace ExemploComunicacaoCSharp
         {
             try
             {
-                // Establish the remote endpoint for the socket.
-                // The name of the 
-                // remote device is "host.contoso.com".
                 IPHostEntry ipHostInfo = Dns.GetHostEntry(txtIP.Text); //Dns.Resolve(txtIP.Text);
                 IPAddress ipAddress = ipHostInfo.AddressList[0];
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
@@ -94,21 +87,21 @@ namespace ExemploComunicacaoCSharp
                 chaveAes[15] = Convert.ToByte(rnd.Next(1, 256));
 
                 command = "";
-                command = command + (char)(2);
+                command += (char)(2);
                 // start byte
 
-                preCommand = preCommand + (char)(7);
+                preCommand += (char)(7);
                 // tamanho do comando
-                preCommand = preCommand + (char)(0);
+                preCommand += (char)(0);
                 // tamanho do comando
-                preCommand = preCommand + "1+RA+00";
+                preCommand += "1+RA+00";
                 chkSum = calcCheckSumString(preCommand);
 
-                command = command + preCommand;
-                command = command + Convert.ToChar(chkSum);
+                command += preCommand;
+                command += Convert.ToChar(chkSum);
                 // checksum
                 // end byte
-                command = command + (char)(3);
+                command += (char)(3);
 
 
                 // Send test data to the remote device.
@@ -120,9 +113,9 @@ namespace ExemploComunicacaoCSharp
                 response = "";
                 while (i < quantBytesRec)
                 {
-                    response = response + (char)bufferBytes[i];
+                    response += (char)bufferBytes[i];
 
-                    i = i + 1;
+                    i++;
                 }
 
 
@@ -133,10 +126,10 @@ namespace ExemploComunicacaoCSharp
                     {
                         if (idxByte <= quantBytesRec - 3)
                         {
-                            strRec = strRec + response.ElementAt(idxByte);
+                            strRec += response.ElementAt(idxByte);
                         }
                     }
-                    idxByte = idxByte + 1;
+                    idxByte++;
                 }
                 strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
                 strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
@@ -147,7 +140,7 @@ namespace ExemploComunicacaoCSharp
 
                 strAux = "1]" + txtUsuario.Text + "]" + txtSenha.Text + "]" + System.Convert.ToBase64String(chaveAes);
 
-                RSAPersistKeyInCSP(strModulo);
+                RSARepo.RSAPersistKeyInCSP(strModulo);
                 byte[] dataToEncrypt = Encoding.Default.GetBytes(strAux);
                 byte[] encryptedData = null;
 
@@ -156,7 +149,7 @@ namespace ExemploComunicacaoCSharp
                 RSAKeyInfo.Modulus = System.Convert.FromBase64String(strModulo);
                 RSAKeyInfo.Exponent = System.Convert.FromBase64String(strExpodente);
 
-                encryptedData = RSAEncrypt(dataToEncrypt, RSAKeyInfo, false);
+                encryptedData = RSARepo.RSAEncrypt(dataToEncrypt, RSAKeyInfo, false);
 
                 strAux = System.Convert.ToBase64String(encryptedData);
 
@@ -165,20 +158,20 @@ namespace ExemploComunicacaoCSharp
 
                 preCommand = "";
                 command = "";
-                command = command + Convert.ToChar(2);
+                command += Convert.ToChar(2);
                 // start byte
-                preCommand = preCommand + Convert.ToChar(strComandoComCriptografia.Length);
+                preCommand += Convert.ToChar(strComandoComCriptografia.Length);
                 // tamanho do comando
-                preCommand = preCommand + Convert.ToChar(0);
+                preCommand += Convert.ToChar(0);
                 // tamanho do comando
-                preCommand = preCommand + strComandoComCriptografia;
+                preCommand += strComandoComCriptografia;
                 chkSum = calcCheckSumString(preCommand);
 
-                command = command + preCommand;
-                command = command + Convert.ToChar(chkSum);
+                command += preCommand;
+                command += Convert.ToChar(chkSum);
                 // checksum
 
-                command = command + Convert.ToChar(3);
+                command += Convert.ToChar(3);
                 // end byte
                 Send(client, command);
                 sendDone.WaitOne();
@@ -190,8 +183,8 @@ namespace ExemploComunicacaoCSharp
                 while (i < quantBytesRec)
                 {
 
-                    response = response + Convert.ToChar(bufferBytes[i]);
-                    i = i + 1;
+                    response += Convert.ToChar(bufferBytes[i]);
+                    i++;
                 }
 
                 strRec = "";
@@ -202,10 +195,10 @@ namespace ExemploComunicacaoCSharp
                     {
                         if (idxByte <= quantBytesRec - 3)
                         {
-                            strRec = strRec + response.ElementAt(idxByte);
+                            strRec += response.ElementAt(idxByte);
                         }
                     }
-                    idxByte = idxByte + 1;
+                    idxByte++;
                 }
                 strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
                 strRec = Mid(strRec, strRec.IndexOf("+") + 2, strRec.Length - strRec.IndexOf("+") - 1);
@@ -227,121 +220,7 @@ namespace ExemploComunicacaoCSharp
             }
         }
 
-        static public byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
-        {
-            try
-            {
-                //Create a new instance of RSACryptoServiceProvider.
-                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
 
-                //Import the RSA Key information. This only needs
-                //toinclude the public key information.
-                RSA.ImportParameters(RSAKeyInfo);
-
-                //Encrypt the passed byte array and specify OAEP padding.  
-                //OAEP padding is only available on Microsoft Windows XP or
-                //later.  
-                return RSA.Encrypt(DataToEncrypt, DoOAEPPadding);
-            }
-            //Catch and display a CryptographicException  
-            //to the console.
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-
-                return null;
-            }
-
-        }
-
-        static public byte[] RSADecrypt(byte[] DataToDecrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
-        {
-            try
-            {
-                //Create a new instance of RSACryptoServiceProvider.
-                RSACryptoServiceProvider RSA = new RSACryptoServiceProvider();
-
-                //Import the RSA Key information. This needs
-                //to include the private key information.
-                RSA.ImportParameters(RSAKeyInfo);
-
-                //Decrypt the passed byte array and specify OAEP padding.  
-                //OAEP padding is only available on Microsoft Windows XP or
-                //later.  
-                return RSA.Decrypt(DataToDecrypt, DoOAEPPadding);
-            }
-            //Catch and display a CryptographicException  
-            //to the console.
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.ToString());
-
-                return null;
-            }
-
-        }
-
-        public static void RSAPersistKeyInCSP(string ContainerName)
-        {
-            try
-            {
-                // Create a new instance of CspParameters.  Pass
-                // 13 to specify a DSA container or 1 to specify
-                // an RSA container.  The default is 1.
-                CspParameters cspParams = new CspParameters();
-
-                // Specify the container name using the passed variable.
-                cspParams.KeyContainerName = ContainerName;
-
-                //Create a new instance of RSACryptoServiceProvider to generate
-                //a new key pair.  Pass the CspParameters class to persist the 
-                //key in the container.  The PersistKeyInCsp property is true by 
-                //default, allowing the key to be persisted. 
-                RSACryptoServiceProvider RSAalg = new RSACryptoServiceProvider(cspParams);
-
-                //Indicate that the key was persisted.
-                Console.WriteLine("The RSA key was persisted in the container, \"{0}\".", ContainerName);
-            }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-
-            }
-        }
-
-        public static void RSADeleteKeyInCSP(string ContainerName)
-        {
-            try
-            {
-                // Create a new instance of CspParameters.  Pass
-                // 13 to specify a DSA container or 1 to specify
-                // an RSA container.  The default is 1.
-                CspParameters cspParams = new CspParameters();
-
-                // Specify the container name using the passed variable.
-                cspParams.KeyContainerName = ContainerName;
-
-                //Create a new instance of RSACryptoServiceProvider. 
-                //Pass the CspParameters class to use the 
-                //key in the container.
-                RSACryptoServiceProvider RSAalg = new RSACryptoServiceProvider(cspParams);
-
-                //Explicitly set the PersistKeyInCsp property to false
-                //to delete the key entry in the container.
-                RSAalg.PersistKeyInCsp = false;
-
-                //Call Clear to release resources and delete the key from the container.
-                RSAalg.Clear();
-
-                //Indicate that the key was persisted.
-                Console.WriteLine("The RSA key was deleted from the container, \"{0}\".", ContainerName);
-            }
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-
-            }
-        }
         public static string Trim(string s)
         {
             return s.Trim();
@@ -361,9 +240,9 @@ namespace ExemploComunicacaoCSharp
             while (i < data.Length)
             {
                 strAux = ((byte)(data.ElementAt(i))).ToString("X2");
-                strBuf = strBuf + strAux;
+                strBuf += strAux;
                 cks = (byte)(cks ^ (byte)(data.ElementAt(i)));
-                i = i + 1;
+                i++;
             }
             return cks;
         }
@@ -390,23 +269,7 @@ namespace ExemploComunicacaoCSharp
             }
         }
 
-        private static void Receive(Socket client)
-        {
-            try
-            {
-                // Create the state object.
-                StateObject state = new StateObject();
-                state.workSocket = client;
 
-                // Begin receiving the data from the remote device.
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-        }
 
         private static void ReceiveCallback(IAsyncResult ar)
         {
@@ -523,7 +386,7 @@ namespace ExemploComunicacaoCSharp
 
                             if (quant > 16)
                             {
-                                quant = quant % 16;
+                                quant %= 16;
                             }
                             else
                             {
@@ -533,7 +396,7 @@ namespace ExemploComunicacaoCSharp
                             while (quant < 16 && quant != 0)
                             {
                                 swEncrypt.Write(Convert.ToChar(Convert.ToByte("0")));
-                                quant = quant - 1;
+                                quant--;
                             }
 
 
@@ -586,7 +449,7 @@ namespace ExemploComunicacaoCSharp
 
                         if (quant > 16)
                         {
-                            quant = quant % 16;
+                            quant %= 16;
                         }
                         quant = 16 - quant;
                         byte[] bytesZeros = new byte[16] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -594,7 +457,7 @@ namespace ExemploComunicacaoCSharp
                         if (quant < 16 && quant != 0)
                         {
                             csEncrypt.Write(bytesZeros, 0, quant);
-                            quant = quant - 1;
+                            quant--;
                         }
                         //using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
                         //{
@@ -764,8 +627,8 @@ namespace ExemploComunicacaoCSharp
             {
                 comandoByte[IdxComandoByte] = IV[i];
 
-                IdxComandoByte = IdxComandoByte + 1;
-                i = i + 1;
+                IdxComandoByte++;
+                i++;
             }
 
             i = 0;
@@ -773,25 +636,25 @@ namespace ExemploComunicacaoCSharp
             {
                 comandoByte[IdxComandoByte] = cmdCrypt[i];
 
-                IdxComandoByte = IdxComandoByte + 1;
-                i = i + 1;
+                IdxComandoByte++;
+                i++;
             }
             i = 1;
             while (i < IdxComandoByte)
             {
-                chkSum = chkSum ^ comandoByte[i];
-                i = i + 1;
+                chkSum ^= comandoByte[i];
+                i++;
             }
             comandoByte[IdxComandoByte] = (byte)chkSum;
-            IdxComandoByte = IdxComandoByte + 1;
+            IdxComandoByte++;
             comandoByte[IdxComandoByte] = 3;
 
             string strAux = "";
             i = 0;
             while (i < IdxComandoByte)
             {
-                strAux = strAux + Convert.ToChar(comandoByte[i]);
-                i = i + 1;
+                strAux += Convert.ToChar(comandoByte[i]);
+                i++;
             }
             Send2(client, comandoByte);
 
@@ -805,9 +668,9 @@ namespace ExemploComunicacaoCSharp
             while (i < quantBytesRec)
             {
 
-                response = response + (char)bufferBytes[i];
+                response += (char)bufferBytes[i];
 
-                i = i + 1;
+                i++;
             }
 
             i = 0;
@@ -821,17 +684,17 @@ namespace ExemploComunicacaoCSharp
                     if (idxByte <= quantBytesRec - 3)
                     {
                         byteData[i] = Convert.ToByte(response.ElementAt(idxByte));
-                        i = i + 1;
-                        strRec = strRec + response.ElementAt(idxByte);
+                        i++;
+                        strRec += response.ElementAt(idxByte);
                     }
                 }
-                idxByte = idxByte + 1;
+                idxByte++;
             }
             i = 0;
             while (i < 16)
             {
                 IV[i] = byteData[i];
-                i = i + 1;
+                i++;
             }
 
             byte[] byteData2 = new byte[quantBytesRec - 16 - 5];
@@ -840,7 +703,7 @@ namespace ExemploComunicacaoCSharp
             while (i < byteData.Length - 16)
             {
                 byteData2[i] = byteData[i + 16];
-                i = i + 1;
+                i++;
             }
 
             strRec = DecryptStringFromBytes_Aes(byteData2, chaveAes, IV);
@@ -900,8 +763,8 @@ namespace ExemploComunicacaoCSharp
             {
                 comandoByte[IdxComandoByte] = IV[i];
 
-                IdxComandoByte = IdxComandoByte + 1;
-                i = i + 1;
+                IdxComandoByte++;
+                i++;
             }
 
             i = 0;
@@ -909,25 +772,25 @@ namespace ExemploComunicacaoCSharp
             {
                 comandoByte[IdxComandoByte] = cmdCrypt[i];
 
-                IdxComandoByte = IdxComandoByte + 1;
-                i = i + 1;
+                IdxComandoByte++;
+                i++;
             }
             i = 1;
             while (i < IdxComandoByte)
             {
-                chkSum = chkSum ^ comandoByte[i];
-                i = i + 1;
+                chkSum ^= comandoByte[i];
+                i++;
             }
             comandoByte[IdxComandoByte] = (byte)chkSum;
-            IdxComandoByte = IdxComandoByte + 1;
+            IdxComandoByte++;
             comandoByte[IdxComandoByte] = 3;
 
             string strAux = "";
             i = 0;
             while (i < IdxComandoByte)
             {
-                strAux = strAux + Convert.ToChar(comandoByte[i]);
-                i = i + 1;
+                strAux += Convert.ToChar(comandoByte[i]);
+                i++;
             }
             Send2(client, comandoByte);
 
@@ -941,9 +804,9 @@ namespace ExemploComunicacaoCSharp
             while (i < quantBytesRec)
             {
 
-                response = response + (char)bufferBytes[i];
+                response += (char)bufferBytes[i];
 
-                i = i + 1;
+                i++;
             }
 
             i = 0;
@@ -957,17 +820,17 @@ namespace ExemploComunicacaoCSharp
                     if (idxByte <= quantBytesRec - 3)
                     {
                         byteData[i] = Convert.ToByte(response.ElementAt(idxByte));
-                        i = i + 1;
-                        strRec = strRec + response.ElementAt(idxByte);
+                        i++;
+                        strRec += response.ElementAt(idxByte);
                     }
                 }
-                idxByte = idxByte + 1;
+                idxByte++;
             }
             i = 0;
             while (i < 16)
             {
                 IV[i] = byteData[i];
-                i = i + 1;
+                i++;
             }
 
             byte[] byteData2 = new byte[quantBytesRec - 16 - 5];
@@ -976,7 +839,7 @@ namespace ExemploComunicacaoCSharp
             while (i < byteData.Length - 16)
             {
                 byteData2[i] = byteData[i + 16];
-                i = i + 1;
+                i++;
             }
 
             byte[] bufferRecDecrypt = DecryptStringFromBytes_Aes2(byteData2, chaveAes, IV);
@@ -987,19 +850,36 @@ namespace ExemploComunicacaoCSharp
                 {
                     break;
                 }
-                i = i + 1;
+                i++;
             }
-            i = i + 1;
+            i++;
 
             int x = 0;
             while (x < 384)
             {
                 biometriaExemplo[x] = bufferRecDecrypt[i + x];
-                x = x + 1;
+                x++;
             }
 
 
             MessageBox.Show("Biometria " + txtMatricula.Text + " recebida.");
+        }
+        private static void Receive(Socket client)
+        {
+            try
+            {
+                // Create the state object.
+                StateObject state = new StateObject();
+                state.workSocket = client;
+
+                // Begin receiving the data from the remote device.
+                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveCallback), state);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -1060,8 +940,8 @@ namespace ExemploComunicacaoCSharp
             {
                 comandoByte[IdxComandoByte] = IV[i];
 
-                IdxComandoByte = IdxComandoByte + 1;
-                i = i + 1;
+                IdxComandoByte++;
+                i++;
             }
 
             i = 0;
@@ -1069,25 +949,25 @@ namespace ExemploComunicacaoCSharp
             {
                 comandoByte[IdxComandoByte] = cmdCrypt[i];
 
-                IdxComandoByte = IdxComandoByte + 1;
-                i = i + 1;
+                IdxComandoByte++;
+                i++;
             }
             i = 1;
             while (i < IdxComandoByte)
             {
-                chkSum = chkSum ^ comandoByte[i];
-                i = i + 1;
+                chkSum ^= comandoByte[i];
+                i++;
             }
             comandoByte[IdxComandoByte] = (byte)chkSum;
-            IdxComandoByte = IdxComandoByte + 1;
+            IdxComandoByte++;
             comandoByte[IdxComandoByte] = 3;
 
             string strAux = "";
             i = 0;
             while (i < IdxComandoByte)
             {
-                strAux = strAux + Convert.ToChar(comandoByte[i]);
-                i = i + 1;
+                strAux += Convert.ToChar(comandoByte[i]);
+                i++;
             }
             Send2(client, comandoByte);
 
@@ -1101,9 +981,9 @@ namespace ExemploComunicacaoCSharp
             while (i < quantBytesRec)
             {
 
-                response = response + (char)bufferBytes[i];
+                response += (char)bufferBytes[i];
 
-                i = i + 1;
+                i++;
             }
 
             i = 0;
@@ -1117,17 +997,17 @@ namespace ExemploComunicacaoCSharp
                     if (idxByte <= quantBytesRec - 3)
                     {
                         byteData[i] = Convert.ToByte(response.ElementAt(idxByte));
-                        i = i + 1;
-                        strRec = strRec + response.ElementAt(idxByte);
+                        i++;
+                        strRec += response.ElementAt(idxByte);
                     }
                 }
-                idxByte = idxByte + 1;
+                idxByte++;
             }
             i = 0;
             while (i < 16)
             {
                 IV[i] = byteData[i];
-                i = i + 1;
+                i++;
             }
 
             byte[] byteData2 = new byte[quantBytesRec - 16 - 5];
@@ -1136,7 +1016,7 @@ namespace ExemploComunicacaoCSharp
             while (i < byteData.Length - 16)
             {
                 byteData2[i] = byteData[i + 16];
-                i = i + 1;
+                i++;
             }
 
             strRec = DecryptStringFromBytes_Aes(byteData2, chaveAes, IV);
