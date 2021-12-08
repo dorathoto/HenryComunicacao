@@ -39,9 +39,9 @@
             this.Label1 = new System.Windows.Forms.Label();
             this.txtIP = new System.Windows.Forms.TextBox();
             this.btnBuscar = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnGetDataHora = new System.Windows.Forms.Button();
             this.txtMatricula = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnGetBiometria = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -141,15 +141,15 @@
             this.btnBuscar.UseVisualStyleBackColor = true;
             this.btnBuscar.Click += new System.EventHandler(this.btnBuscar_Click);
             // 
-            // button1
+            // btnGetDataHora
             // 
-            this.button1.Location = new System.Drawing.Point(177, 145);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(142, 23);
-            this.button1.TabIndex = 23;
-            this.button1.Text = "Receber Data/Hora";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnGetDataHora.Location = new System.Drawing.Point(177, 145);
+            this.btnGetDataHora.Name = "btnGetDataHora";
+            this.btnGetDataHora.Size = new System.Drawing.Size(142, 23);
+            this.btnGetDataHora.TabIndex = 23;
+            this.btnGetDataHora.Text = "Receber Data/Hora";
+            this.btnGetDataHora.UseVisualStyleBackColor = true;
+            this.btnGetDataHora.Click += new System.EventHandler(this.btnGetDataHora_Click);
             // 
             // txtMatricula
             // 
@@ -159,15 +159,15 @@
             this.txtMatricula.TabIndex = 24;
             this.txtMatricula.Text = "1";
             // 
-            // button2
+            // btnGetBiometria
             // 
-            this.button2.Location = new System.Drawing.Point(177, 174);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(142, 23);
-            this.button2.TabIndex = 25;
-            this.button2.Text = "Receber Biometria";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnGetBiometria.Location = new System.Drawing.Point(177, 174);
+            this.btnGetBiometria.Name = "btnGetBiometria";
+            this.btnGetBiometria.Size = new System.Drawing.Size(142, 23);
+            this.btnGetBiometria.TabIndex = 25;
+            this.btnGetBiometria.Text = "Receber Biometria";
+            this.btnGetBiometria.UseVisualStyleBackColor = true;
+            this.btnGetBiometria.Click += new System.EventHandler(this.btnGetBiometria_Click);
             // 
             // button3
             // 
@@ -195,9 +195,9 @@
             this.ClientSize = new System.Drawing.Size(329, 232);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnGetBiometria);
             this.Controls.Add(this.txtMatricula);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnGetDataHora);
             this.Controls.Add(this.txtSenha);
             this.Controls.Add(this.Label5);
             this.Controls.Add(this.txtUsuario);
@@ -210,7 +210,7 @@
             this.Controls.Add(this.txtIP);
             this.Controls.Add(this.btnBuscar);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Formulário test";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -229,9 +229,9 @@
         internal System.Windows.Forms.Label Label1;
         internal System.Windows.Forms.TextBox txtIP;
         internal System.Windows.Forms.Button btnBuscar;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnGetDataHora;
         private System.Windows.Forms.TextBox txtMatricula;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnGetBiometria;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label label6;
     }

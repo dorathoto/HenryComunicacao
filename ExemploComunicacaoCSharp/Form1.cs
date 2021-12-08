@@ -604,7 +604,7 @@ namespace ExemploComunicacaoCSharp
             return bufferDecrypt;
 
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void btnGetDataHora_Click(object sender, EventArgs e)
         {
             Random rnd = new Random();
 
@@ -739,7 +739,7 @@ namespace ExemploComunicacaoCSharp
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void btnGetBiometria_Click(object sender, EventArgs e)
         {
             Random rnd = new Random();
 
@@ -1052,18 +1052,4 @@ namespace ExemploComunicacaoCSharp
             MessageBox.Show("Biometria " + txtMatricula.Text + " enviada para o equipamento.");
         }
     }
-    // State object for receiving data from remote device.
-    public class StateObject
-    {
-        // Client socket.
-        public Socket workSocket = null;
-        // Size of receive buffer.
-        public const int BufferSize = 256;
-        // Receive buffer.
-        public byte[] buffer = new byte[BufferSize];
-        // Received data string.
-        public StringBuilder sb = new StringBuilder();
-    }
-
-
 }
