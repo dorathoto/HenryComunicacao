@@ -144,10 +144,11 @@ namespace ExemploComunicacaoCSharp
                 byte[] dataToEncrypt = Encoding.Default.GetBytes(strAux);
                 byte[] encryptedData = null;
 
-                RSAParameters RSAKeyInfo = new RSAParameters();
-
-                RSAKeyInfo.Modulus = System.Convert.FromBase64String(strModulo);
-                RSAKeyInfo.Exponent = System.Convert.FromBase64String(strExpodente);
+                RSAParameters RSAKeyInfo = new RSAParameters
+                {
+                    Modulus = System.Convert.FromBase64String(strModulo),
+                    Exponent = System.Convert.FromBase64String(strExpodente)
+                };
 
                 encryptedData = RSARepo.RSAEncrypt(dataToEncrypt, RSAKeyInfo, false);
 
@@ -346,16 +347,30 @@ namespace ExemploComunicacaoCSharp
                 Console.WriteLine(e.ToString());
             }
         }
-
+        /// <summary>
+        /// https://docs.microsoft.com/pt-br/dotnet/api/system.security.cryptography.aes.-ctor?view=net-6.0
+        /// </summary>
+        /// <param name="plainText"></param>
+        /// <param name="Key"></param>
+        /// <param name="IV"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         static byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
         {
             // Check arguments.
             if (plainText == null || plainText.Length <= 0)
+            {
                 throw new ArgumentNullException("plainText");
+            }
             if (Key == null || Key.Length <= 0)
+            {
                 throw new ArgumentNullException("Key");
+            }
             if (IV == null || IV.Length <= 0)
+            {
                 throw new ArgumentNullException("Key");
+            }
+
             byte[] encrypted;
             // Create an Aes object
             // with the specified key and IV.
@@ -487,15 +502,30 @@ namespace ExemploComunicacaoCSharp
             return encrypted;
 
         }
+
+        /// <summary>
+        /// https://docs.microsoft.com/pt-br/dotnet/api/system.security.cryptography.aes.-ctor?view=net-6.0
+        /// </summary>
+        /// <param name="cipherText"></param>
+        /// <param name="Key"></param>
+        /// <param name="IV"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)
         {
             // Check arguments.
             if (cipherText == null || cipherText.Length <= 0)
+            {
                 throw new ArgumentNullException("cipherText");
+            }
             if (Key == null || Key.Length <= 0)
+            {
                 throw new ArgumentNullException("Key");
+            }
             if (IV == null || IV.Length <= 0)
+            {
                 throw new ArgumentNullException("Key");
+            }
 
             // Declare the string used to hold
             // the decrypted text.
